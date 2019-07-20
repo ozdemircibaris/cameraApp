@@ -81,8 +81,6 @@ export default class CameraScreen extends React.Component {
   async componentWillMount() {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({ permissionsGranted: status === 'granted' });
-   
-
   }
 
   componentDidMount() {
@@ -96,13 +94,6 @@ export default class CameraScreen extends React.Component {
         FileSystem.deleteAsync(PHOTOS_DIR)
       }
     })
-    
-
-    // if(dir.exist)
-    // FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'photos').catch(e => {
-    //   console.log(e, 'Directory exists');
-    // });
-
   }
 
   getRatios = async () => {
@@ -195,71 +186,6 @@ export default class CameraScreen extends React.Component {
   renderGallery() {
     return <GalleryScreen onPress={this.toggleView.bind(this)} />;
   }
-
-  renderFace({ bounds, faceID, rollAngle, yawAngle }) {
-    return (
-      <View
-        key={faceID}
-        transform={[
-          { perspective: 600 },
-          { rotateZ: `${rollAngle.toFixed(0)}deg` },
-          { rotateY: `${yawAngle.toFixed(0)}deg` },
-        ]}
-        style={[
-          styles.face,
-          {
-            ...bounds.size,
-            left: bounds.origin.x,
-            top: bounds.origin.y,
-          },
-        ]}>
-        <Text style={styles.faceText}>ID: {faceID}</Text>
-        <Text style={styles.faceText}>rollAngle: {rollAngle.toFixed(0)}</Text>
-        <Text style={styles.faceText}>yawAngle: {yawAngle.toFixed(0)}</Text>
-      </View>
-    );
-  }
-
-  renderLandmarksOfFace(face) {
-    const renderLandmark = position =>
-      position && (
-        <View
-          style={[
-            styles.landmark,
-            {
-              left: position.x - landmarkSize / 2,
-              top: position.y - landmarkSize / 2,
-            },
-          ]}
-        />
-      );
-    return (
-      <View key={`landmarks-${face.faceID}`}>
-        {renderLandmark(face.leftEyePosition)}
-        {renderLandmark(face.rightEyePosition)}
-        {renderLandmark(face.leftEarPosition)}
-        {renderLandmark(face.rightEarPosition)}
-        {renderLandmark(face.leftCheekPosition)}
-        {renderLandmark(face.rightCheekPosition)}
-        {renderLandmark(face.leftMouthPosition)}
-        {renderLandmark(face.mouthPosition)}
-        {renderLandmark(face.rightMouthPosition)}
-        {renderLandmark(face.noseBasePosition)}
-        {renderLandmark(face.bottomMouthPosition)}
-      </View>
-    );
-  }
-
-  renderFaces = () => 
-    <View style={styles.facesContainer} pointerEvents="none">
-      {this.state.faces.map(this.renderFace)}
-    </View>
-
-  renderLandmarks = () => 
-    <View style={styles.facesContainer} pointerEvents="none">
-      {this.state.faces.map(this.renderLandmarksOfFace)}
-    </View>
-
   renderNoPermissions = () => 
     <View style={styles.noPermissions}>
       <Text style={{ color: 'white' }}>
@@ -287,46 +213,16 @@ export default class CameraScreen extends React.Component {
   renderBottomBar = () =>
     <View
       style={styles.bottomBar}>
-      <TouchableOpacity style={styles.bottomButton} onPress={this.toggleMoreOptions}>
-        <Octicons name="kebab-horizontal" size={30} color="white"/>
-      </TouchableOpacity>
-      <View style={{ flex: 0.4 }}>
+      <View style={{ flex: 1 }}>
         <TouchableOpacity
           onPress={this.takePicture}
           style={{ alignSelf: 'center' }}
         >
           <Ionicons name="ios-radio-button-on" size={70} color="white" />
         </TouchableOpacity>
-      </View> 
-      <TouchableOpacity style={styles.bottomButton} onPress={this.toggleView}>
-        <View>
-          <Foundation name="thumbnails" size={30} color="white" />
-          {this.state.newPhotos && <View style={styles.newPhotosDot}/>}
-        </View>
-      </TouchableOpacity>
+      </View>
     </View>
 
-  renderMoreOptions = () =>
-    (
-      <View style={styles.options}>
-        
-
-        <View style={styles.pictureSizeContainer}>
-          <Text style={styles.pictureQualityLabel}>Picture quality</Text>
-          <View style={styles.pictureSizeChooser}>
-            <TouchableOpacity onPress={this.previousPictureSize} style={{ padding: 6 }}>
-              <Ionicons name="md-arrow-dropleft" size={14} color="white" />
-            </TouchableOpacity>
-            <View style={styles.pictureSizeLabel}>
-              <Text style={{color: 'white'}}>{this.state.pictureSize}</Text>
-            </View>
-            <TouchableOpacity onPress={this.nextPictureSize} style={{ padding: 6 }}>
-              <Ionicons name="md-arrow-dropright" size={14} color="white" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    );
 
   renderCamera = () =>
     (
@@ -351,8 +247,6 @@ export default class CameraScreen extends React.Component {
           {this.renderTopBar()}
           {this.renderBottomBar()}
         </Camera>
-        {this.state.faceDetecting && this.renderFaces()}
-        {this.state.faceDetecting && this.renderLandmarks()}
         {this.state.showMoreOptions && this.renderMoreOptions()}
       </View>
     );
@@ -369,7 +263,7 @@ export default class CameraScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#ffffff',
   },
   camera: {
     flex: 1,
@@ -396,11 +290,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 10,
   },
-  gallery: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
   toggleButton: {
     flex: 0.25,
     height: 40,
@@ -416,86 +305,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   bottomButton: {
-    flex: 0.3, 
-    height: 58, 
+    flex: 0.3,
+    height: 58,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  newPhotosDot: {
-    position: 'absolute',
-    top: 0,
-    right: -5,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#4630EB'
-  },
-  options: {
-    position: 'absolute',
-    bottom: 80,
-    left: 30,
-    width: 200,
-    height: 160,
-    backgroundColor: '#000000BA',
-    borderRadius: 4,
-    padding: 10,
-  },
-  detectors: {
-    flex: 0.5,
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  pictureQualityLabel: {
-    fontSize: 10,
-    marginVertical: 3, 
-    color: 'white'
-  },
-  pictureSizeContainer: {
-    flex: 0.5,
-    alignItems: 'center',
-    paddingTop: 10,
-  },
-  pictureSizeChooser: {
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexDirection: 'row'
-  },
-  pictureSizeLabel: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  facesContainer: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    left: 0,
-    top: 0,
-  },
-  face: {
-    padding: 10,
-    borderWidth: 2,
-    borderRadius: 2,
-    position: 'absolute',
-    borderColor: '#FFD700',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  landmark: {
-    width: landmarkSize,
-    height: landmarkSize,
-    position: 'absolute',
-    backgroundColor: 'red',
-  },
-  faceText: {
-    color: '#FFD700',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    margin: 10,
-    backgroundColor: 'transparent',
-  },
-  row: {
-    flexDirection: 'row',
   },
 });

@@ -55,7 +55,7 @@ export default class GalleryScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-            {this.renderPhoto(this.state.photos)}
+        {this.renderPhoto(this.state.photos)}
       </View>
     );
   }
@@ -63,13 +63,5 @@ export default class GalleryScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  pictures: {
-    flex: 1,
-    flexWrap: 'wrap',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 8,
   },
 });
